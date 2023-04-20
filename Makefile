@@ -35,8 +35,8 @@ MiniMFE_verify.o : MiniMFE_verify.c
 external_functions.o: external_functions.c
 	$(CC) external_functions.c -o bin/external_functions.o $(CFLAGS) $(LIBRARIES) -c
 
-tar: MiniMFE.c MiniMFE-wrapper.c MiniMFE_verify.c external_functions.h external_functions.c Makefile
-	tar -cvf MiniMFE.tar $^
+tar:
+	tar -cvf MiniMFE.tar *.h *.c
 
 bin:
 	mkdir -p bin
