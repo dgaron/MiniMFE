@@ -139,12 +139,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	for (mz1=0;mz1 < N+1; mz1++) {
 		H[mz1] = &_lin_H[(mz1*(N+1))];
 	}
-	#define S2(i,j) H(-i+N,j) = foo(A(-i+N),B(j))
-	#define S3(i,j) H(-i+N,j) = __min_float(foo(A(-i+N),B(j)),__min_float(H(-i+N+1,j),H(-i+N,j-1)))
-	#define S4(i,j) H(-i+N,j) = bar((foo(A(-i+N),B(j)))+(T(-i+N+1,j-1)),H(-i+N+1,j),H(-i+N,j-1))
-	#define S5(i0,i1) *score = T(0,N)
-	#define S0(i,j) T(-i+N,j) = __min_float(W(-i+N,j),H(-i+N,j))
-	#define S1(i,j) T(-i+N,j) = __min_float(__min_float(H(-i+N,j),W(-i+N,j)),reduce_MiniMFE_T_1(N,-i+N,j,T))
+
 	{
 		//Domain
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
@@ -154,32 +149,27 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
 		int c1,c2;
-		S2((0),(N));
-		S0((0),(N));
-		S2((1),(N-1));
-		S0((1),(N-1));
-		S3((1),(N));
-		S1((1),(N));
-		for(c1=2;c1 <= N;c1+=1)
-		 {
-		 	S2((c1),(-c1+N));
-		 	S0((c1),(-c1+N));
-		 	S3((c1),(-c1+N+1));
-		 	S1((c1),(-c1+N+1));
-		 	for(c2=-c1+N+2;c2 <= N;c2+=1)
-		 	 {
-		 	 	S4((c1),(c2));
-		 	 	S1((c1),(c2));
+
+		H(N, N) = foo(A(N), B(N));
+		T(N, N) = __min_float(W(N, N), H(N, N));
+		H(N - 1, N - 1) = foo(A(N - 1), B(N - 1));
+		T(N - 1, N - 1) = __min_float(W(N - 1, N - 1), H(N - 1, N - 1));
+		H(N - 1, N) = __min_float(foo(A(N - 1), B(N)), __min_float(H(N, N), H(N - 1,N - 1)));
+		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), reduce_MiniMFE_T_1(N, N - 1, N, T));
+
+		for(c1 = N; c1 >= 2; --c1) {
+		 	H(c1 - 2, c1 - 2) = foo(A(c1 - 2), B(c1 - 2));
+		 	T(c1 - 2, c1 - 2) = __min_float(W(c1 - 2, c1 - 2), H(c1 - 2, c1 - 2));
+		 	H(c1 - 2, (c1 - 1)) = __min_float(foo(A(c1 - 2), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1 - 2, c1 - 2)));
+		 	T(c1 - 2, (c1 - 1)) = __min_float(__min_float(H(c1 - 2, c1 - 1), W(c1 - 2, c1 - 1)), reduce_MiniMFE_T_1(N, c1 - 2, c1 - 1, T));
+
+		 	for(c2 = c1; c2 <= N; ++c2) {
+		 	 	H(c1 - 2, c2) = bar((foo(A(c1 - 2), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1 - 2, c2 - 1));
+		 	 	T(c1 - 2, c2) = __min_float(__min_float(H(c1 - 2, c2), W(c1 - 2, c2)), reduce_MiniMFE_T_1(N, c1 - 2, c2, T));
 		 	 }
-		 }
-		S5((N+1),(N+1));
+		}
+		*score = T(0, N);
 	}
-	#undef S2
-	#undef S3
-	#undef S4
-	#undef S5
-	#undef S0
-	#undef S1
 	
 	//Memory Free
 	free(_lin_T);
@@ -190,17 +180,15 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 }
 float reduce_MiniMFE_T_1(long N, int ip, int jp, float** T){
 	float reduceVar = FLT_MAX;
-	#define S2(i,j,k) {float __temp__ = (T(i,k))+(T(k+1,j)); reduceVar = __min_float(reduceVar,__temp__); }
 	{
 		//Domain
 		//{i,j,k|jp>=ip+1 && N>=jp && ip>=0 && N>=1 && N+jp>=ip+1 && j>=k+1 && N+j>=i+1 && i>=0 && k>=i && N>=k && N>=j && k>=-1 && j>=i+1 && ip==i && jp==j}
 		int c3;
-		for(c3=ip;c3 <= jp-1;c3+=1)
-		 {
-		 	S2((ip),(jp),(c3));
-		 }
+		for(c3 = ip; c3 <= jp - 1; c3 += 1) {
+			float __temp__ = (T(ip, c3)) + (T(c3 + 1, jp)); 
+			reduceVar = __min_float(reduceVar, __temp__);
+		}
 	}
-	#undef S2
 	return reduceVar;
 }
 
