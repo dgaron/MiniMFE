@@ -1,0 +1,5 @@
+### No Mac Garbage
+*.DS_Store
+
+### Ignore bin
+bin/*
