@@ -3,7 +3,7 @@ LIBRARIES=-lm
 CC?=gcc
 OBJS = external_functions.o
 
-TASKS = v1 readable
+TASKS = v1 readable verbose Nmem
 PLAIN_TARGETS = $(TASKS:%=MiniMFE-%)
 CHECK_TARGETS = $(PLAIN_TARGETS:%=%.check)
 VERIFY_TARGETS = $(PLAIN_TARGETS:%=%.verify)
