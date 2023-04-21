@@ -7,3 +7,9 @@
 * This is semantically the same as the original version
 * Replaces the computation macros with their corresponding definitions
 * Uses a decrementing loop counter for the outer loop which improves readability
+
+### verbose
+* This version will print the reads and writes to the H and T structures to aid in observing the memory access pattern
+
+### Nmem
+* This version allocates only N+1 memory for H by overwriting values that are no longer needed
