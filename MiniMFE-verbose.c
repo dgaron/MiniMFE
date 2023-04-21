@@ -113,7 +113,7 @@ float reduce_MiniMFE_T_1(long, int, int, float**);
 #define B(i) B[i]
 #define W(i,j) W[i][j]
 #define T(i,j) T[i][j]
-#define H(i,j) H[j]
+#define H(i,j) H[i][j]
 
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
@@ -132,8 +132,14 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		T[mz1] = &_lin_T[(mz1*(N+1))];
 	}
 	
-	float* H = (float*)malloc(sizeof(float*)*(N+1));
+	float* _lin_H = (float*)malloc(sizeof(float)*((N+1) * (N+1)));
+	mallocCheck(_lin_H, ((N+1) * (N+1)), float);
+	float** H = (float**)malloc(sizeof(float*)*(N+1));
 	mallocCheck(H, (N+1), float*);
+	for (mz1=0;mz1 < N+1; mz1++) {
+		H[mz1] = &_lin_H[(mz1*(N+1))];
+	}
+	
 	#define S2(i,j) H(-i+N,j) = foo(A(-i+N),B(j)); \
 								if (N < 10) { \
 								printf("WRITE to H[%d][%d]\n", -i+N, j); printf("\n"); }
