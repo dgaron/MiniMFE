@@ -113,7 +113,7 @@ float reduce_MiniMFE_T_1(long, int, int, float**);
 #define B(i) B[i]
 #define W(i,j) W[i][j]
 #define T(i,j) T[i][j]
-#define H(i,j) H[j]
+#define H(i,j) H[i + j]
 
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
