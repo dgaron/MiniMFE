@@ -13,3 +13,8 @@
 
 ### Nmem
 * This version allocates only N+1 memory for H by overwriting values that are no longer needed
+* Now updated so that the writes are schedule independent
+
+### Tile
+* Tiles the inner loops
+* Rectangular tiles, width > height
