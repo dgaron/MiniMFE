@@ -115,6 +115,9 @@ float reduce_MiniMFE_T_1(long, int, int, float**);
 #define T(i,j) T[i][j]
 #define H(i,j) H[MOD(i + j, N + 1)]
 
+#define BLOCK_i 256
+#define BLOCK_j 2048
+
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
 	if (!((N >= 1))) {
@@ -144,6 +147,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
 		int c1,c2;
+		int i,j;
 
 		H(N, N) = foo(A(N), B(N));
 		T(N, N) = __min_float(W(N, N), H(N, N));
@@ -152,16 +156,19 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		H(N - 1, N) = __min_float(foo(A(N - 1), B(N)), __min_float(H(N, N), H(N - 1,N - 1)));
 		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), reduce_MiniMFE_T_1(N, N - 1, N, T));
 
-		for(c1 = N - 2; c1 >= 0; --c1) {
-		 	H(c1, c1) = foo(A(c1), B(c1));
-		 	T(c1, c1) = __min_float(W(c1, c1), H(c1, c1));
-		 	H(c1, (c1 - 1)) = __min_float(foo(A(c1), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1, c1)));
-		 	T(c1, (c1 - 1)) = __min_float(__min_float(H(c1, c1 - 1), W(c1, c1 - 1)), reduce_MiniMFE_T_1(N, c1, c1 - 1, T));
-
-		 	for(c2 = c1; c2 <= N; ++c2) {
-		 	 	H(c1, c2) = bar((foo(A(c1), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1, c2 - 1));
-		 	 	T(c1, c2) = __min_float(__min_float(H(c1, c2), W(c1, c2)), reduce_MiniMFE_T_1(N, c1, c2, T));
-		 	 }
+		for (i = N; i >= 2; i -= BLOCK_i) {
+			for (j = c1; j <= N; j += BLOCK_j) {
+				for(c1 = N; c1 >= max(i - BLOCK_i, 2); --c1) {
+					H(c1 - 2, c1 - 2) = foo(A(c1 - 2), B(c1 - 2));
+					T(c1 - 2, c1 - 2) = __min_float(W(c1 - 2, c1 - 2), H(c1 - 2, c1 - 2));
+					H(c1 - 2, (c1 - 1)) = __min_float(foo(A(c1 - 2), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1 - 2, c1 - 2)));
+					T(c1 - 2, (c1 - 1)) = __min_float(__min_float(H(c1 - 2, c1 - 1), W(c1 - 2, c1 - 1)), reduce_MiniMFE_T_1(N, c1 - 2, c1 - 1, T));
+					for(c2 = c1; c2 <= min(j + BLOCK_j, N); ++c2) {
+						H(c1 - 2, c2) = bar((foo(A(c1 - 2), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1 - 2, c2 - 1));
+						T(c1 - 2, c2) = __min_float(__min_float(H(c1 - 2, c2), W(c1 - 2, c2)), reduce_MiniMFE_T_1(N, c1 - 2, c2, T));
+					}
+				}
+			}
 		}
 		*score = T(0, N);
 	}
