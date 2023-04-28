@@ -203,6 +203,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	free(_lin_T);
 	free(T);
 	
+	free(_lin_H);
 	free(H);
 }
 float reduce_MiniMFE_T_1(long N, int ip, int jp, float** T){
