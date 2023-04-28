@@ -157,15 +157,15 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		H(N - 1, N) = __min_float(foo(A(N - 1), B(N)), __min_float(H(N, N), H(N - 1,N - 1)));
 		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), reduce_MiniMFE_T_1(N, N - 1, N, T));
 
-		for(c1 = N; c1 >= 2; --c1) {
-		 	H(c1 - 2, c1 - 2) = foo(A(c1 - 2), B(c1 - 2));
-		 	T(c1 - 2, c1 - 2) = __min_float(W(c1 - 2, c1 - 2), H(c1 - 2, c1 - 2));
-		 	H(c1 - 2, (c1 - 1)) = __min_float(foo(A(c1 - 2), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1 - 2, c1 - 2)));
-		 	T(c1 - 2, (c1 - 1)) = __min_float(__min_float(H(c1 - 2, c1 - 1), W(c1 - 2, c1 - 1)), reduce_MiniMFE_T_1(N, c1 - 2, c1 - 1, T));
+		for(c1 = N - 2; c1 >= 0; --c1) {
+		 	H(c1, c1) = foo(A(c1), B(c1));
+		 	T(c1, c1) = __min_float(W(c1, c1), H(c1, c1));
+		 	H(c1, (c1 - 1)) = __min_float(foo(A(c1), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1, c1)));
+		 	T(c1, (c1 - 1)) = __min_float(__min_float(H(c1, c1 - 1), W(c1, c1 - 1)), reduce_MiniMFE_T_1(N, c1, c1 - 1, T));
 
 		 	for(c2 = c1; c2 <= N; ++c2) {
-		 	 	H(c1 - 2, c2) = bar((foo(A(c1 - 2), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1 - 2, c2 - 1));
-		 	 	T(c1 - 2, c2) = __min_float(__min_float(H(c1 - 2, c2), W(c1 - 2, c2)), reduce_MiniMFE_T_1(N, c1 - 2, c2, T));
+		 	 	H(c1, c2) = bar((foo(A(c1), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1, c2 - 1));
+		 	 	T(c1, c2) = __min_float(__min_float(H(c1, c2), W(c1, c2)), reduce_MiniMFE_T_1(N, c1, c2, T));
 		 	 }
 		}
 		*score = T(0, N);
