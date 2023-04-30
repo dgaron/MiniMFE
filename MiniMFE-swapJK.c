@@ -101,6 +101,9 @@ inline double __min_double(double x, double y){
 	return ((x)>(y) ? (y) : (x));
 }
 
+//Local Function Declarations
+float reduce_MiniMFE_T_1(long, int, int, float**);
+
 //Memory Macros
 #define A(i) A[i]
 #define B(i) B[i]
@@ -136,10 +139,6 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i0,i1|i1==N+1 && i0==N+1 && N>=1}
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
-
-	    // K loop domain
-        //{i,j,k|jp>=ip+1 && N>=jp && ip>=0 && N>=1 && N+jp>=ip+1 && j>=k+1 && N+j>=i+1 && i>=0 && k>=i && N>=k && N>=j && k>=-1 && j>=i+1 && ip==i && jp==j}
-
 		int i, j, k;
 	    float reduceVar, __temp__;
 
@@ -160,13 +159,9 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		 	for(j = i + 2; j <= N; ++j) {
 		 	 	H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
 
-				reduceVar = FLT_MAX;
-				for(k = i; k <= j - 1; ++k) {
-					__temp__ = (T(i, k)) + (T(k + 1, j)); 
-					reduceVar = __min_float(reduceVar, __temp__);
-				}
 
-		 	 	T(i, j) = __min_float(__min_float(H(i, j), W(i, j)), reduceVar);
+
+		 	 	T(i, j) = __min_float(__min_float(H(i, j), W(i, j)), reduce_MiniMFE_T_1(N, i, j, T));
 		 	}
 			// End modified section
 
@@ -180,7 +175,19 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	
 	free(H);
 }
-
+float reduce_MiniMFE_T_1(long N, int ip, int jp, float** T){
+	float reduceVar = FLT_MAX;
+	{
+		//Domain
+		//{i,j,k|jp>=ip+1 && N>=jp && ip>=0 && N>=1 && N+jp>=ip+1 && j>=k+1 && N+j>=i+1 && i>=0 && k>=i && N>=k && N>=j && k>=-1 && j>=i+1 && ip==i && jp==j}
+		int k;
+		for(k = ip; k <= jp - 1; ++k) {
+			float __temp__ = (T(ip, k)) + (T(k + 1, jp)); 
+			reduceVar = __min_float(reduceVar, __temp__);
+		}
+	}
+	return reduceVar;
+}
 //Memory Macros
 #undef A
 #undef B

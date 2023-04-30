@@ -101,10 +101,6 @@ inline double __min_double(double x, double y){
 	return ((x)>(y) ? (y) : (x));
 }
 
-
-
-
-
 //Local Function Declarations
 float reduce_MiniMFE_T_1(long, int, int, float**);
 
@@ -184,7 +180,7 @@ float reduce_MiniMFE_T_1(long N, int ip, int jp, float** T){
 		//Domain
 		//{i,j,k|jp>=ip+1 && N>=jp && ip>=0 && N>=1 && N+jp>=ip+1 && j>=k+1 && N+j>=i+1 && i>=0 && k>=i && N>=k && N>=j && k>=-1 && j>=i+1 && ip==i && jp==j}
 		int k;
-		for(k = ip; k <= jp - 1; k += 1) {
+		for(k = ip; k <= jp - 1; ++k) {
 			float __temp__ = (T(ip, k)) + (T(k + 1, jp)); 
 			reduceVar = __min_float(reduceVar, __temp__);
 		}
