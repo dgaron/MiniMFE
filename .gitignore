@@ -3,3 +3,6 @@
 
 ### Ignore bin
 bin/*
+
+### We don't need that data script
+*.sh
