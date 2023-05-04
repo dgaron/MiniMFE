@@ -158,9 +158,12 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 
 				reduceVar = FLT_MAX;
 				for(j = max(i + 2, k + 1); j <= N; ++j) {
-					H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
-
-					if (k != i) { reduceVar = T(i, j); }
+					if (k == i) {
+						H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
+					}
+					else { 
+						reduceVar = T(i, j); 
+					}
 
 					__temp__ = __min_float(reduceVar, (T(i, k)) + (T(k + 1, j))); 
 
