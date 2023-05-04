@@ -137,7 +137,6 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
 		int i, j, k;
-	    float reduceVar, __temp__;
 
 		H(N, N) = foo(A(N), B(N));
 		T(N, N) = __min_float(W(N, N), H(N, N));
