@@ -157,8 +157,8 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), reduce_MiniMFE_T_1(N, N - 1, N, T));
 
 		for (i = N; i >= 2; i -= BLOCK_i) {
-			for (j = c1; j <= N; j += BLOCK_j) {
-				for(c1 = N; c1 >= max(i - BLOCK_i, 2); --c1) {
+			for (j = i; j <= N; j += BLOCK_j) {
+				for(c1 = i; c1 >= max(i - BLOCK_i, 2); --c1) {
 					H(c1 - 2, c1 - 2) = foo(A(c1 - 2), B(c1 - 2));
 					T(c1 - 2, c1 - 2) = __min_float(W(c1 - 2, c1 - 2), H(c1 - 2, c1 - 2));
 					H(c1 - 2, (c1 - 1)) = __min_float(foo(A(c1 - 2), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1 - 2, c1 - 2)));
