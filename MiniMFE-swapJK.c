@@ -153,21 +153,13 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 			T(i, (i + 1)) = __min_float(__min_float(H(i, i + 1), W(i, i + 1)), (T(i, i) + T(i + 1, i + 1)));
 
 			// Interchanged loop structure
-			reduceVar = FLT_MAX;
 			for(k = i; k <= N - 1; ++k) {
-
-				reduceVar = FLT_MAX;
 				for(j = max(i + 2, k + 1); j <= N; ++j) {
 					if (k == i) {
 						H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
-						reduceVar = __min_float(H(i, j), W(i, j));
+						T(i, j) = __min_float(H(i, j), W(i, j));
 					}
-					else { 
-						reduceVar = T(i, j); 
-					}
-
-					T(i, j) = __min_float(reduceVar, (T(i, k)) + (T(k + 1, j))); 
-
+					T(i, j) = __min_float(T(i, j), (T(i, k)) + (T(k + 1, j))); 
 				}
 			} // End interchanged loop section
 		}

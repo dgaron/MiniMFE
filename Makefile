@@ -27,7 +27,7 @@ MiniMFE-%.verify-rand: MiniMFE_verify.o MiniMFE-%.o $(OBJS)
 	$(CC) MiniMFE-wrapper.c -o bin/$@ $(^:%=bin/%) $(CFLAGS) $(LIBRARIES) -DVERIFY -DRANDOM
 
 MiniMFE-%.o : MiniMFE-%.c
-	$(CC) $< -o bin/$@ $(CFLAGS) $(LIBRARIES) -c
+	$(CC) $< -o bin/$@ $(CFLAGS) $(LIBRARIES) -c -fopt-info-vec
 
 MiniMFE_verify.o : MiniMFE_verify.c
 	$(CC) MiniMFE_verify.c -o bin/MiniMFE_verify.o $(CFLAGS) $(LIBRARIES) -c
