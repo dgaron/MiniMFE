@@ -15,14 +15,21 @@
 * This version allocates only N+1 memory for H by overwriting values that are no longer needed
 * Now updated so that the writes are schedule independent
 
-### Tile
+### tile
 * Tiles the inner loops
 * Rectangular tiles, width > height
 
-### Transpose
+### transpose
 * Keeps a copy of T matrix transpose for locality improvement in the k loop
 * K loop inside reduce_MiniMFE_T_1() function placed directly in MiniMFE() function
   * Not strictly necessary here, but done in preparation of attempting to swap K & J loops
 
-### Transpose 1x
+### transpose 1x
 * Stores the transpose of upper triangular matrix T in the unused lower triangle of the allocated memory space
+
+### swapJK
+* Inlines the 'k' loop that was buried in the function call to reduce_MiniMFE_T_1()
+* Swaps the 'j' and 'k' loops:
+  * Initializes each entry in the row
+  * Iterates over rows, updating each entry, taking advantage of the associativity of the min operation
+  * Allows for auto-vectorization by the compiler
