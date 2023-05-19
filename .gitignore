@@ -6,3 +6,6 @@ bin/*
 
 ### We don't need that data script
 *.sh
+
+### Don't need test results
+*.csv

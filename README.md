@@ -21,8 +21,6 @@
 
 ### transpose
 * Keeps a copy of T matrix transpose for locality improvement in the k loop
-* K loop inside reduce_MiniMFE_T_1() function placed directly in MiniMFE() function
-  * Not strictly necessary here, but done in preparation of attempting to swap K & J loops
 
 ### transpose 1x
 * Stores the transpose of upper triangular matrix T in the unused lower triangle of the allocated memory space

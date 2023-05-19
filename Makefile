@@ -1,6 +1,6 @@
-CFLAGS= -O3  -std=c99  -I/usr/include/malloc/
-LIBRARIES=-lm
-CC?=gcc
+CFLAGS = -O3  -std=c99  -I/usr/include/malloc/
+LIBRARIES = -lm
+CC = icc
 OBJS = external_functions.o
 
 TASKS = v1 readable verbose Nmem tile transpose transpose1x swapJK
@@ -11,7 +11,7 @@ VERIFY_RAND_TARGETS = $(PLAIN_TARGETS:%=%.verify-rand)
 
 all: bin external_functions.o MiniMFE_verify.o $(PLAIN_TARGETS) $(CHECK_TARGETS) $(VERIFY_TARGETS) $(VERIFY_RAND_TARGETS)
 
-debug: CFLAGS =-DDEBUG -g -Wall -Wextra -std=c99 -I/usr/include/malloc/
+debug: CFLAGS = -DDEBUG -g -Wall -Wextra -std=c99 -I/usr/include/malloc/
 debug: all
 		
 MiniMFE-%: MiniMFE-%.o $(OBJS)
@@ -27,7 +27,7 @@ MiniMFE-%.verify-rand: MiniMFE_verify.o MiniMFE-%.o $(OBJS)
 	$(CC) MiniMFE-wrapper.c -o bin/$@ $(^:%=bin/%) $(CFLAGS) $(LIBRARIES) -DVERIFY -DRANDOM
 
 MiniMFE-%.o : MiniMFE-%.c
-	$(CC) $< -o bin/$@ $(CFLAGS) $(LIBRARIES) -c -fopt-info-vec
+	$(CC) $< -o bin/$@ $(CFLAGS) $(LIBRARIES) -c
 
 MiniMFE_verify.o : MiniMFE_verify.c
 	$(CC) MiniMFE_verify.c -o bin/MiniMFE_verify.o $(CFLAGS) $(LIBRARIES) -c
