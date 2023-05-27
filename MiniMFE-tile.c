@@ -111,7 +111,7 @@ float reduce_MiniMFE_T_1(long, int, int, float**);
 #define T(i,j) T[i][j]
 #define H(i,j) H[MOD(i + j, N + 1)]
 
-#define BLOCK_SIZE 4
+#define BLOCK_SIZE 1024
 
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
