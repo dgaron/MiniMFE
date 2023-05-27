@@ -101,10 +101,6 @@ inline double __min_double(double x, double y){
 	return ((x)>(y) ? (y) : (x));
 }
 
-
-
-
-
 //Local Function Declarations
 float reduce_MiniMFE_T_1(long, int, int, float**);
 
@@ -115,8 +111,7 @@ float reduce_MiniMFE_T_1(long, int, int, float**);
 #define T(i,j) T[i][j]
 #define H(i,j) H[MOD(i + j, N + 1)]
 
-#define BLOCK_i 256
-#define BLOCK_j 2048
+#define BLOCK_SIZE 4
 
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
@@ -146,8 +141,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i0,i1|i1==N+1 && i0==N+1 && N>=1}
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
-		int c1,c2;
-		int i,j;
+		int i,j,ii,jj;
 
 		H(N, N) = foo(A(N), B(N));
 		T(N, N) = __min_float(W(N, N), H(N, N));
@@ -156,20 +150,21 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		H(N - 1, N) = __min_float(foo(A(N - 1), B(N)), __min_float(H(N, N), H(N - 1,N - 1)));
 		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), reduce_MiniMFE_T_1(N, N - 1, N, T));
 
-		for (i = N; i >= 2; i -= BLOCK_i) {
-			for (j = i; j <= N; j += BLOCK_j) {
-				for(c1 = i; c1 >= max(i - BLOCK_i, 2); --c1) {
-					H(c1 - 2, c1 - 2) = foo(A(c1 - 2), B(c1 - 2));
-					T(c1 - 2, c1 - 2) = __min_float(W(c1 - 2, c1 - 2), H(c1 - 2, c1 - 2));
-					H(c1 - 2, (c1 - 1)) = __min_float(foo(A(c1 - 2), B(c1 - 1)), __min_float(H(c1 - 1, c1 - 1), H(c1 - 2, c1 - 2)));
-					T(c1 - 2, (c1 - 1)) = __min_float(__min_float(H(c1 - 2, c1 - 1), W(c1 - 2, c1 - 1)), reduce_MiniMFE_T_1(N, c1 - 2, c1 - 1, T));
-					for(c2 = c1; c2 <= min(j + BLOCK_j, N); ++c2) {
-						H(c1 - 2, c2) = bar((foo(A(c1 - 2), B(c2))) + (T(c1 - 1, c2 - 1)), H(c1 - 1, c2), H(c1 - 2, c2 - 1));
-						T(c1 - 2, c2) = __min_float(__min_float(H(c1 - 2, c2), W(c1 - 2, c2)), reduce_MiniMFE_T_1(N, c1 - 2, c2, T));
+		for (ii = N - 2; ii >= 0; ii -= BLOCK_SIZE) {
+			for(jj = max(ii - BLOCK_SIZE + 3, 2); jj <= N; jj += BLOCK_SIZE) {
+				for(i = ii; i >= max(ii - BLOCK_SIZE + 1, 0); --i) {
+					H(i, i) = foo(A(i), B(i));
+					T(i, i) = __min_float(W(i, i), H(i, i));
+					H(i, (i + 1)) = __min_float(foo(A(i), B(i + 1)), __min_float(H(i + 1, i + 1), H(i, i)));
+					T(i, (i + 1)) = __min_float(__min_float(H(i, i + 1), W(i, i + 1)), reduce_MiniMFE_T_1(N, i, i + 1, T));
+
+					for(j = max(i + 2, jj); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
+						H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
+						T(i, j) = __min_float(__min_float(H(i, j), W(i, j)), reduce_MiniMFE_T_1(N, i, j, T));
 					}
 				}
-			}
-		}
+			} // end jj
+		} // end ii 
 		*score = T(0, N);
 	}
 	
@@ -184,9 +179,9 @@ float reduce_MiniMFE_T_1(long N, int ip, int jp, float** T){
 	{
 		//Domain
 		//{i,j,k|jp>=ip+1 && N>=jp && ip>=0 && N>=1 && N+jp>=ip+1 && j>=k+1 && N+j>=i+1 && i>=0 && k>=i && N>=k && N>=j && k>=-1 && j>=i+1 && ip==i && jp==j}
-		int c3;
-		for(c3 = ip; c3 <= jp - 1; c3 += 1) {
-			float __temp__ = (T(ip, c3)) + (T(c3 + 1, jp)); 
+		int k;
+		for(k = ip; k <= jp - 1; ++k) {
+			float __temp__ = (T(ip, k)) + (T(k + 1, jp)); 
 			reduceVar = __min_float(reduceVar, __temp__);
 		}
 	}
