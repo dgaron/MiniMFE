@@ -25,9 +25,13 @@
 ### transpose 1x
 * Stores the transpose of upper triangular matrix T in the unused lower triangle of the allocated memory space
 
-### swapJK
+### inline
 * Inlines the 'k' loop that was buried in the function call to reduce_MiniMFE_T_1()
 * Swaps the 'j' and 'k' loops:
   * Initializes each entry in the row
   * Iterates over rows, updating each entry, taking advantage of the associativity of the min operation
   * Allows for auto-vectorization by the compiler
+
+### inlineTile
+* Tiles the version with the inlined reduce function
+
