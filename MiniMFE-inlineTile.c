@@ -108,6 +108,8 @@ inline double __min_double(double x, double y){
 #define T(i,j) T[i][j]
 #define H(i,j) H[MOD(i + j, N + 1)]
 
+#define BLOCK_SIZE 1024
+
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
 	if (!((N >= 1))) {
@@ -136,7 +138,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		//{i0,i1|i1==N+1 && i0==N+1 && N>=1}
 		//{i,j|i+j==N && N>=1 && N>=i && i>=0}
 		//{i,j|i+j>=N+1 && N>=1 && N>=i && N>=j && i+j>=1}
-		int i, j, k;
+		int i, j, k, ii, jj;
 
 		H(N, N) = foo(A(N), B(N));
 		T(N, N) = __min_float(W(N, N), H(N, N));
@@ -145,24 +147,29 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 		H(N - 1, N) = __min_float(foo(A(N - 1), B(N)), __min_float(H(N, N), H(N - 1,N - 1)));
 		T(N - 1, N) = __min_float(__min_float(H(N - 1, N), W(N - 1, N)), (T(N - 1, N - 1) + T(N, N)));
 
-		for(i = N - 2; i >= 0; --i) {
-			H(i, i) = foo(A(i), B(i));
-			T(i, i) = __min_float(W(i, i), H(i, i));
-			H(i, (i + 1)) = __min_float(foo(A(i), B(i + 1)), __min_float(H(i + 1, i + 1), H(i, i)));
-			T(i, (i + 1)) = __min_float(__min_float(H(i, i + 1), W(i, i + 1)), (T(i, i) + T(i + 1, i + 1)));
+		for (ii = N - 2; ii >= 0; ii -= BLOCK_SIZE) {
+			for(jj = max(ii - BLOCK_SIZE + 3, 2); jj <= N; jj += BLOCK_SIZE) {
+				for(i = ii; i >= max(ii - BLOCK_SIZE + 1, 0); --i) {
+					H(i, i) = foo(A(i), B(i));
+					T(i, i) = __min_float(W(i, i), H(i, i));
+					H(i, (i + 1)) = __min_float(foo(A(i), B(i + 1)), __min_float(H(i + 1, i + 1), H(i, i)));
+					T(i, (i + 1)) = __min_float(__min_float(H(i, i + 1), W(i, i + 1)), (T(i, i) + T(i + 1, i + 1)));
 
-			// Interchanged loop structure
-			for(j = i + 2; j <= N; ++j) {
-				H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
-				T(i, j) = __min_float(H(i, j), W(i, j));
-			}
+					// Interchanged loop structure
+					for(j = max(i + 2, jj); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
+						H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
+						T(i, j) = __min_float(H(i, j), W(i, j));
+					}
 
-			for(k = i + 1; k <= N - 1; ++k) {
-				for(j = max(i + 2, k + 1); j <= N; ++j) {
-					T(i, j) = __min_float(T(i, j), (T(i, k)) + (T(k + 1, j))); 
+					for(k = i + 1; k <= N - 1; ++k) {
+						for(j = max(max(i + 2, jj), k + 1); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
+						//for(j = max(i + 2, k + 1); j <= N; ++j) {
+							T(i, j) = __min_float(T(i, j), (T(i, k)) + (T(k + 1, j))); 
+						}
+					} // End interchanged loop section
 				}
-			} // End interchanged loop section
-		}
+			} // end jj
+		} // end ii 
 		*score = T(0, N);
 	}
 	
