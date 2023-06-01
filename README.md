@@ -35,3 +35,5 @@
 ### inlineTile
 * Tiles the version with the inlined reduce function
 
+### midPatch
+* Splits the reduce_MiniMFE_T_1() function into three segments
