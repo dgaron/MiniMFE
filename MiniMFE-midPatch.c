@@ -203,8 +203,9 @@ float reduce_MiniMFE_T_1_SPLIT(int bs, long N, int ip, int jp, float** T) {
 	}
 
 	// (jp - BLOCK_SIZE + 1) to (jp - 1)
+	// max(jp - bs + 1, ip + bs - 2) adjusts for when BLOCK_SIZE - 1 < jp - ip < 2 * (BLOCK_SIZE - 1)
 	reduceVar_bottom = FLT_MAX;
-	for(k = jp - bs + 1; k <= jp - 1; ++k) {
+	for(k = max(jp - bs + 1, ip + bs - 2); k <= jp - 1; ++k) {
 		__temp3__ = (T(ip, k)) + (T(k + 1, jp)); 
 		reduceVar_bottom = __min_float(reduceVar_bottom, __temp3__);
 	}
