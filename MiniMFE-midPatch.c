@@ -112,7 +112,7 @@ float reduce_MiniMFE_T_1_SPLIT(int, long, int, int, float**);
 #define T(i,j) T[i][j]
 #define H(i,j) H[MOD(i + j, N + 1)]
 
-#define BLOCK_SIZE 256
+#define BLOCK_SIZE 1024
 
 void MiniMFE(long N, float* A, float* B, float** W, float* score){
 	///Parameter checking
@@ -159,7 +159,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 					H(i, (i + 1)) = __min_float(foo(A(i), B(i + 1)), __min_float(H(i + 1, i + 1), H(i, i)));
 					T(i, (i + 1)) = __min_float(__min_float(H(i, i + 1), W(i, i + 1)), reduce_MiniMFE_T_1(N, i, i + 1, T));
 
-					for(j = max(i + 2, jj); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
+					for(j = i + 2; j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
 						H(i, j) = bar((foo(A(i), B(j))) + (T(i + 1, j - 1)), H(i + 1, j), H(i, j - 1));
 
 						T(i, j) = reduce_MiniMFE_T_1_SPLIT(BLOCK_SIZE, N, i, j, T);

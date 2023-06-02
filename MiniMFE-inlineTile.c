@@ -162,8 +162,7 @@ void MiniMFE(long N, float* A, float* B, float** W, float* score){
 					}
 
 					for(k = i + 1; k <= N - 1; ++k) {
-						for(j = max(max(i + 2, jj), k + 1); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
-						//for(j = max(i + 2, k + 1); j <= N; ++j) {
+						for(j = max(i + 2, k + 1); j <= min(jj + BLOCK_SIZE - 1, N); ++j) {
 							T(i, j) = __min_float(T(i, j), (T(i, k)) + (T(k + 1, j))); 
 						}
 					} // End interchanged loop section
