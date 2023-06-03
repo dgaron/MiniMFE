@@ -4,7 +4,7 @@ CC = icc
 OBJS = external_functions.o
 
 
-TASKS = v1 readable verbose Nmem tile transpose transpose1x inline inlineTile midPatch
+TASKS = v1 readable verbose Nmem tile transpose inline inlineTile midPatch
 # I use this one for testing so I don't recompile a billion files every time
 # TASKS = midPatch
 PLAIN_TARGETS = $(TASKS:%=MiniMFE-%)

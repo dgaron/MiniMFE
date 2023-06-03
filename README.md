@@ -21,8 +21,6 @@
 
 ### transpose
 * Keeps a copy of T matrix transpose for locality improvement in the k loop
-
-### transpose 1x
 * Stores the transpose of upper triangular matrix T in the unused lower triangle of the allocated memory space
 
 ### inline
